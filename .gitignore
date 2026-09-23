@@ -34,3 +34,4 @@ build/
 /src/main/resources/application-local.yml
 /src/main/java/com/kaoyu/laiagent/demo/invoke/TestApiKey.java
 /src/test/
+/tmp/

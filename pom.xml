@@ -91,6 +91,38 @@
             <version>1.17.0-beta27</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-generator</artifactId>
+            <version>4.38.0</version>
+        </dependency>
+
+<!--        持久化记忆，序列化依赖-->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>5.6.2</version>
+        </dependency>
+
+<!--    读取markdown文档依赖-->
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-markdown-document-reader -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-markdown-document-reader</artifactId>
+            <version>1.1.6</version>
+        </dependency>
+
+<!--        向量数据库依赖-->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-advisors-vector-store</artifactId>
+            <version>1.1.7</version>
+        </dependency>
+
+
+
+
+
 
 
     </dependencies>

@@ -1,18 +1,26 @@
 package com.kaoyu.laiagent.app;
 
+import com.kaoyu.laiagent.advisor.MyLoggerAdvisor;
+import com.kaoyu.laiagent.chatmemory.FileBaseMemory;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Slf4j
 public class LoveApp {
+
+
 
     private final ChatClient chatClient;
 
@@ -24,12 +32,19 @@ public class LoveApp {
 
     public LoveApp(ChatModel dashscopeChatModel) {
         //初始化内存保存记忆
-        ChatMemory chatMemory = MessageWindowChatMemory.builder().maxMessages(10).build();
+//        ChatMemory chatMemory = MessageWindowChatMemory.builder().maxMessages(10).build();
 
+        //自定义持久化对话记忆
+        String fileDir = System.getProperty("user.dir")+"/tmp/chat-memory";
+        ChatMemory chatMemory = new FileBaseMemory(fileDir,10);
         chatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
-                        MessageChatMemoryAdvisor.builder(chatMemory).build()
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        //自定义日志，按需开启
+                        new MyLoggerAdvisor()
+                        // 重读强化回答，按需开启
+//                        new ReReadingAdvisor()
                 )
                 .build();
     }
@@ -44,9 +59,47 @@ public class LoveApp {
         //查看token消耗
         Usage tokenUsage = chatResponse.getMetadata().getUsage();
         log.info("token消耗：{}",tokenUsage);
-        log.info("打印消息：{}",text);
+//        log.info("打印消息：{}",text);
         return text;
+    }
 
+    record LoveReport(String title, List<String> suggestions) {
+    }
+
+    public LoveReport doChatWithStructure(String message,String chatId){
+        LoveReport loveReport = chatClient
+                .prompt()
+                .system(SYSTEM_PROMPT + "每次对话后都要生成恋爱结果，标题位{用户名}的恋爱报告，内容为建议列表")
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .call()
+                .entity(LoveReport.class);
+        log.info("loveReport:{}",loveReport);
+        return loveReport;
+    }
+
+
+
+    @Resource
+    private VectorStore loveAppVectorStore;
+
+    @Resource
+    private Advisor loveAppRagCloudAdvisor;
+    //rag检索增强
+    public String doChatWithRag(String message,String chatId){
+        ChatResponse chatResponse = chatClient.prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .advisors(new MyLoggerAdvisor())
+               //.advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build())  //自定义的rag知识库服务
+                .advisors(loveAppRagCloudAdvisor)   //云rag知识库服务
+                .call()
+                .chatResponse();
+        String text = chatResponse.getResult().getOutput().getText();
+        //查看token消耗
+        Usage tokenUsage = chatResponse.getMetadata().getUsage();
+//        log.info("打印消息：{}",text);
+        return text;
     }
 
 
