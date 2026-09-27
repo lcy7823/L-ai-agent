@@ -2,11 +2,15 @@ package com.kaoyu.laiagent.app;
 
 import com.kaoyu.laiagent.advisor.MyLoggerAdvisor;
 import com.kaoyu.laiagent.chatmemory.FileBaseMemory;
+import com.kaoyu.laiagent.common.PageRequest;
+import com.kaoyu.laiagent.demo.extend.LoveAppRagCustomAdvisorFactory;
+import com.kaoyu.laiagent.demo.extend.QueryRewrite;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -84,15 +88,32 @@ public class LoveApp {
     private VectorStore loveAppVectorStore;
 
     @Resource
+    private VectorStore pgVectorStore;
+
+    @Resource
     private Advisor loveAppRagCloudAdvisor;
+
+    @Resource
+    private QueryRewrite queryRewrite;
+
     //rag检索增强
     public String doChatWithRag(String message,String chatId){
+        //查询重写
+        //String rewriteMessage=queryRewrite.doQueryRewrite(message);
         ChatResponse chatResponse = chatClient.prompt()
                 .user(message)
                 .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
                 .advisors(new MyLoggerAdvisor())
-               //.advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build())  //自定义的rag知识库服务
-                .advisors(loveAppRagCloudAdvisor)   //云rag知识库服务
+                //自定义的rag本地内存知识库服务
+               .advisors(QuestionAnswerAdvisor.builder(loveAppVectorStore).build())
+                //云rag知识库服务
+                //.advisors(loveAppRagCloudAdvisor)
+                //使用pgvector的rag知识库服务
+               //.advisors(QuestionAnswerAdvisor.builder(pgVectorStore).build())
+                //添加状态标签字段筛选，例：已婚，恋爱，未婚
+//                .advisors(LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor(
+//                        "家庭",loveAppVectorStore
+//                ))
                 .call()
                 .chatResponse();
         String text = chatResponse.getResult().getOutput().getText();

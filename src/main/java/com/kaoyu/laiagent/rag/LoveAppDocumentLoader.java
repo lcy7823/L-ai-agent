@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 自定义的rag知识库文档加载器
+ *
+ */
 @Component
 @Slf4j
 public class LoveAppDocumentLoader {
@@ -29,12 +33,16 @@ public class LoveAppDocumentLoader {
             Resource[] resources = resourcePatternResolver.getResources("classpath:document/*.md");
             for (Resource resource : resources){
                 String filename = resource.getFilename();
+                //分割文件名，获取status标签
+                String status=filename.substring(0,2);
 
                 MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
                         .withHorizontalRuleCreateDocument(true)
                         .withIncludeBlockquote(false)
                         .withIncludeCodeBlock(false)
                         .withAdditionalMetadata("filename", filename)
+                        //添加status标签
+//                        .withAdditionalMetadata("status",status)
                         .build();
                 MarkdownDocumentReader reader = new MarkdownDocumentReader(resource, config);
                 allDocuments.addAll(reader.get());

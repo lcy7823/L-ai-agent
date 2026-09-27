@@ -3,7 +3,17 @@ spring:
     name: L-ai-agent
   profiles:
     active: local
-
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 123456
+  ai:
+    vectorstore:
+      pgvector:
+        index-type: hnsw
+        dimensions: 1536
+        distance-type: cosine_distance
+        max-document-batch-size: 1000
 
 server:
   port: 8123
