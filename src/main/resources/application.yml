@@ -14,6 +14,20 @@ spring:
         dimensions: 1536
         distance-type: cosine_distance
         max-document-batch-size: 1000
+    mcp:
+      client:
+        toolcallback:
+          enabled: true
+        sse:
+          connections:
+            server1:
+              url: http://localhost:8127
+
+#        stdio:
+#          servers-configuration: classpath:mcp-servers.json
+
+
+
 
 server:
   port: 8123

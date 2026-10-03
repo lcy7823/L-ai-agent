@@ -1,7 +1,7 @@
 package com.kaoyu.laiagent.rag;
 
-import com.kaoyu.laiagent.demo.extend.MyKeyWordEnrich;
-import com.kaoyu.laiagent.demo.extend.MyTokenTextSplit;
+import com.kaoyu.laiagent.rag.extend.MyKeyWordEnrich;
+import com.kaoyu.laiagent.rag.extend.MyTokenTextSplit;
 import jakarta.annotation.Resource;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;

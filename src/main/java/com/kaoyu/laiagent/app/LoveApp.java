@@ -2,9 +2,7 @@ package com.kaoyu.laiagent.app;
 
 import com.kaoyu.laiagent.advisor.MyLoggerAdvisor;
 import com.kaoyu.laiagent.chatmemory.FileBaseMemory;
-import com.kaoyu.laiagent.common.PageRequest;
-import com.kaoyu.laiagent.demo.extend.LoveAppRagCustomAdvisorFactory;
-import com.kaoyu.laiagent.demo.extend.QueryRewrite;
+import com.kaoyu.laiagent.rag.extend.QueryRewrite;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -15,6 +13,8 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +53,13 @@ public class LoveApp {
                 .build();
     }
 
+
+
+
+    /**
+     * 普通调用ai
+     *
+     */
     public String doChat(String message,String chatId){
         ChatResponse chatResponse = chatClient.prompt()
                 .user(message)
@@ -61,15 +68,20 @@ public class LoveApp {
                 .chatResponse();
         String text = chatResponse.getResult().getOutput().getText();
         //查看token消耗
-        Usage tokenUsage = chatResponse.getMetadata().getUsage();
-        log.info("token消耗：{}",tokenUsage);
-//        log.info("打印消息：{}",text);
+        log.info("打印消息：{}",text);
         return text;
     }
+
+
+
 
     record LoveReport(String title, List<String> suggestions) {
     }
 
+    /**
+     * 结构化输出
+     *
+     */
     public LoveReport doChatWithStructure(String message,String chatId){
         LoveReport loveReport = chatClient
                 .prompt()
@@ -81,6 +93,8 @@ public class LoveApp {
         log.info("loveReport:{}",loveReport);
         return loveReport;
     }
+
+
 
 
 
@@ -96,7 +110,10 @@ public class LoveApp {
     @Resource
     private QueryRewrite queryRewrite;
 
-    //rag检索增强
+    /**
+     * rag 检索增强
+     *
+     */
     public String doChatWithRag(String message,String chatId){
         //查询重写
         //String rewriteMessage=queryRewrite.doQueryRewrite(message);
@@ -124,6 +141,49 @@ public class LoveApp {
     }
 
 
+
+
+    @Resource
+    private ToolCallback[] allTools;
+
+    /**
+     * 工具调用
+     *
+     */
+    public String doChatWithTools(String message,String chatId){
+        ChatResponse chatResponse = chatClient.prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .advisors(new MyLoggerAdvisor())
+                .toolCallbacks(allTools)
+                .call()
+                .chatResponse();
+        String text = chatResponse.getResult().getOutput().getText();
+        //查看token消耗
+        log.info("打印消息:{}",text);
+        return text;
+    }
+
+    @Resource
+    private ToolCallbackProvider toolCallbackProvider;
+
+    /**
+     * 工具调用
+     *
+     */
+    public String doChatWithMcp(String message,String chatId){
+        ChatResponse chatResponse = chatClient.prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .advisors(new MyLoggerAdvisor())
+                .toolCallbacks(toolCallbackProvider)
+                .call()
+                .chatResponse();
+        String result = chatResponse.getResult().getOutput().getText();
+        //查看token消耗
+        log.info("打印 消息:{}",result);
+        return result;
+    }
 
 
 

@@ -144,8 +144,34 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- 网页解析依赖Source: https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.23.1</version>
+            <scope>compile</scope>
+        </dependency>
 
+<!--        https://github.com/itext/itext-java/tree/9.8.0-->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext-core</artifactId>
+            <version>9.4.0</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>bouncy-castle-adapter</artifactId>
+            <version>9.4.0</version>
+        </dependency>
 
+        <!--MCP依赖 Source: https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-mcp-client</artifactId>
+            <version>1.1.7</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 

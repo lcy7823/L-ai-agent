@@ -1,4 +1,4 @@
-package com.kaoyu.laiagent.demo.extend;
+package com.kaoyu.laiagent.rag.extend;
 
 
 import jakarta.annotation.Resource;

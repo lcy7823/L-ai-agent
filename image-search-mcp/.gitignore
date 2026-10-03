@@ -31,8 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
-/src/main/resources/application-local.yml
-/src/main/java/com/kaoyu/laiagent/demo/invoke/TestApiKey.java
 /src/test/
-/tmp/
-/image-search-mcp/src/main/java/com/kaoyu/imagesearchmcp/tools/ApiKey.java
