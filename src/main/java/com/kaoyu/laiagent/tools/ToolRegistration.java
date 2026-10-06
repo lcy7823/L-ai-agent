@@ -13,19 +13,17 @@ public class ToolRegistration {
     private String searchApiKey;
 
     @Bean
-    public ToolCallback[] allTools(){
+    public ToolCallback[] allTools() {
         return ToolCallbacks.from(
-            new WebPageSearchTool(searchApiKey),
-            new WebScrapeTool(),
-            new FileOperationTool(),
-            new TerminalOperationTool(),
-            new ResourceDownloadTool(),
-            new PdfGenerateTool()
+                new WebPageSearchTool(searchApiKey),
+                new WebScrapeTool(),
+                new FileOperationTool(),
+                new TerminalOperationTool(),
+                new ResourceDownloadTool(),
+                new PdfGenerateTool(),
+                new TerminateTool()
         );
     }
-
-
-
 
 
 }

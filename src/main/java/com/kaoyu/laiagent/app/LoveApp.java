@@ -17,6 +17,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -44,9 +45,9 @@ public class LoveApp {
         chatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
-                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        MessageChatMemoryAdvisor.builder(chatMemory).build()
                         //自定义日志，按需开启
-                        new MyLoggerAdvisor()
+//                        new MyLoggerAdvisor()
                         // 重读强化回答，按需开启
 //                        new ReReadingAdvisor()
                 )
@@ -183,6 +184,20 @@ public class LoveApp {
         //查看token消耗
         log.info("打印 消息:{}",result);
         return result;
+    }
+
+
+
+    /**
+     * 流式输出
+     *
+     */
+    public Flux<String> doChatByStream(String message, String chatId){
+        return chatClient.prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .stream()
+                .content();
     }
 
 

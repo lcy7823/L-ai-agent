@@ -1,0 +1,30 @@
+package com.kaoyu.laiagent.agent.model;
+
+
+/**
+ * 代码执行的枚举类
+ */
+public enum AgentState {
+
+
+    /**
+     * 空闲状态
+     */
+    IDLE,
+
+    /**
+     * 运行中状态
+     */
+    RUNNING,
+
+    /**
+     * 完成状态
+     */
+    FINISHED,
+
+    /**
+     * 错误状态
+     */
+    ERROR
+
+}
